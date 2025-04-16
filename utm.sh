@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# ===================================================================
+# Filename:        utm.sh
+# Author:          Lorenzo De Simone
+# Version:         1.0
+# Created:         2025-04-16
+# Description:     CLI Script to start UTM VMs based by course
+# ===================================================================
+
+
 # CSIN VMs
 _CL1="LAB-CL1-CSIN"
 _DC1="LAB-DC1-CSIN"
