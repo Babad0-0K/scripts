@@ -28,7 +28,7 @@ while getopts ${_OPTSTRING} _FACH; do
 			_FACH_OPT="${OPTARG}"
 			;;
 		h)
-			echo "Usage ${0} [-a action] [-f <fach>] [-h]"
+			echo "Usage: utm [-a action] [-f <fach>] [-h]"
 			exit 0
 			;;
 		\?)
