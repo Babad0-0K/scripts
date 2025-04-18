@@ -9,6 +9,7 @@
 # ===================================================================
 
 # to-do: delete old branches
+# to-do: no option should print help
 # to-do: make getopts cleaner
 # to-do: implement actions array
 # to-do: implement error handling
