@@ -10,7 +10,6 @@
 
 # to-do: no option should print help
 # to-do: make getopts cleaner
-# to-do: implement actions array (done)
 # to-do: implement error handling
 # to-do: implement delete action
 # to-do: implement colors
