@@ -8,13 +8,21 @@
 # Description:     CLI Script to start UTM VMs based by course
 # ===================================================================
 
+# todo: add courses array
+# todo: -l list courses +VMs
 
-# CSIN VMs
-_CL1="LAB-CL1-CSIN"
-_DC1="LAB-DC1-CSIN"
+# Declare VMs and Courses Array
+declare -a _IFA_VMS
+declare -a _IFA_COURSES
 
-# BMBs VMs
-_KALI1="kali-2025-W15_HF-BMBS"
+# List VMs
+while IFS= read -r line
+	do
+		if [[ "${line: -5:1}" == "-" ]]; then
+			_IFA_VMS+=("$line")
+		fi
+done < <(utmctl list | sed '1d' | awk '{print $3}')
+
 
 # GETOPTS STUFF
 _OPTSTRING="a:f:h"
@@ -42,23 +50,18 @@ while getopts ${_OPTSTRING} _FACH; do
 esac
 done
 
+# Function to operate VMs for chosen Fach 
+function operateVMS {
+	local _action_opt=${1}
+	local _fach_opt=${2}
 
-# Functions to operate VMs for chosen Fach
-function operateCSIN {
-	utmctl "${_ACTION_OPT}" "${_CL1}"
-	utmctl "${_ACTION_OPT}" "${_DC1}"	
+	for i in "${_IFA_VMS[@]}"
+	do
+		if [[ "${i: -4}" == "${_fach_opt}" ]]; then
+			echo  "utmctl ${_action_opt} ${i}"
+		fi
+	done
 }
-
-function operateBMBS {
-	utmctl "${_ACTION_OPT}" "${_KALI1}"
-}
-
 
 # Main Script
-if [[ "${_FACH_OPT}" == "CSIN" ]]; then
-	operateCSIN
-fi
-
-if [[ "${_FACH_OPT}" == "BMBS" ]]; then
-	operateBMBS
-fi
+operateVMS "${_ACTION_OPT}" "${_FACH_OPT}"
