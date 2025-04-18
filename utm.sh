@@ -7,10 +7,10 @@
 # Created:         2025-04-16
 # Description:     CLI Script to start UTM VMs based by Class
 # ===================================================================
-	
+
 # to-do: no option should print help
 # to-do: make getopts cleaner
-# to-do: implement actions array
+# to-do: implement actions array (done)
 # to-do: implement error handling
 # to-do: implement delete action
 # to-do: implement colors
@@ -19,9 +19,10 @@
 ### Preparation Tasks ####
 ##########################
 
-# Declare VMs and classes array
+# Declare VMs, classes and actions array
 declare -a _IFA_VMS
 declare -a _IFA_CLASSES
+declare -a _UTM_ACTIONS=("start" "stop" "suspend")
 
 # Search for IFA VMs and save to _IFA_VMS
 function funcCheckVm() {
@@ -59,6 +60,14 @@ function funcListClasses() {
 		done
 }
 
+# List Actions
+function funcListActions() {
+	for _action in "${_UTM_ACTIONS[@]}"
+		do
+			echo "  ${_action}"
+	done
+}
+
 # List VMs sorted by Class
 function funcListVm() {
 	for _class in "${_IFA_CLASSES[@]}"
@@ -94,9 +103,7 @@ function funcHelp(){
 	echo "  -f, class - which class VMs you want to operate"
 	echo ""
 	echo "ACTIONS:"
-	echo "  start"
-	echo "  stop"
-	echo "  suspend"
+	funcListActions
 	echo ""
 	echo "CLASSES:"
 	funcListClasses	
