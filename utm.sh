@@ -8,8 +8,7 @@
 # Description:     CLI Script to start UTM VMs based by Class
 # ===================================================================
 
-# to-do: no option should print help (done)
-# to-do: make getopts cleaner (done)
+
 # to-do: implement error handling
 # to-do: implement delete action
 # to-do: implement colors
