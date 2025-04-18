@@ -13,6 +13,7 @@
 # to-do: make getopts cleaner
 # to-do: implement actions array
 # to-do: implement error handling
+# to-do: implement delete action
 
 ##########################
 ### Preparation Tasks ####
