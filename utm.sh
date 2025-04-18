@@ -9,7 +9,7 @@
 # ===================================================================
 
 
-# to-do: implement error handling
+# to-do: implement error handling (done)
 # to-do: implement delete action
 # to-do: implement colors
 
@@ -23,7 +23,7 @@ declare -a _IFA_CLASSES
 declare -a _UTM_ACTIONS=("start" "stop" "suspend")
 
 # Search for IFA VMs and save to _IFA_VMS
-function funcCheckVm() {
+function funcCheckVmIFA() {
 	while IFS= read -r line
 		do
 			if [[ "${line: -5:1}" == "-" ]]; then
@@ -33,17 +33,17 @@ function funcCheckVm() {
 }
 
 # Get class from VM Name and save to _IFA_CLASSES
-function funcCheckClasses() {
+function funcCheckClassesIFA() {
 	for _vm in "${_IFA_VMS[@]}"
-		do
-			if ! [[ $(echo ${_IFA_CLASSES[@]} | fgrep -w "${_vm: -4}") ]]; then
+	do
+		if ! [[ $(echo ${_IFA_CLASSES[@]} | fgrep -w "${_vm: -4}") ]]; then
 				_IFA_CLASSES+=("${_vm: -4}")
-			fi
+		fi
 	done
 }
 
-funcCheckVm
-funcCheckClasses
+funcCheckVmIFA
+funcCheckClassesIFA
 
 
 ##########################
@@ -53,31 +53,31 @@ funcCheckClasses
 # List Classes 
 function funcListClasses() {
 	for _class in "${_IFA_CLASSES[@]}"
-		do
-			echo "  ${_class}"
-		done
+	do
+		echo "  ${_class}"
+	done
 }
 
 # List Actions
 function funcListActions() {
 	for _action in "${_UTM_ACTIONS[@]}"
-		do
-			echo "  ${_action}"
+	do
+		echo "  ${_action}"
 	done
 }
 
 # List VMs sorted by Class
 function funcListVmByClass() {
 	for _class in "${_IFA_CLASSES[@]}"
+	do
+		echo "VMs for class: ${_class}"
+		for _vm in "${_IFA_VMS[@]}"
 		do
-			echo "VMs for class: ${_class}"
-			for _vm in "${_IFA_VMS[@]}"
-				do
-				if [[ "${_vm: -4}" == "${_class}" ]]; then
-					echo "  * ${_vm}"
-				fi
-			done
-			echo ""
+			if [[ "${_vm: -4}" == "${_class}" ]]; then
+				echo "  * ${_vm}"
+			fi
+		done
+		echo ""
 	done
 }
 
@@ -135,18 +135,77 @@ if [ "${_CHECKARG1}" == "" ] || [ "${_CHECKARG2}" == "" ]; then
 	exit
 fi
 
-# Function to operate VMs for chosen Fach 
-function operateVMS() {
+
+########################
+### SCRIPT FUNCTIONS ###
+########################
+
+# Function to check if action is valid
+function funcCheckAction() {
+	local _input_action=${1}
+	local _not_valid=0
+
+	for _action in "${_UTM_ACTIONS[@]}"
+	do
+		if [[ "${_input_action}" == "${_action}" ]]
+		then
+			return 0
+		else
+			_not_valid=1
+		fi
+	done
+
+	if [[ "${_not_valid}" -eq 1 ]]; then
+		echo "ERROR: ${_input_action} is not a valid action"
+		exit 1
+	fi
+}
+
+# Function to check if class is valid
+function funcCheckClass() {
+	local _input_class=${1}
+	local _not_valid=0
+
+	for _class in "${_IFA_CLASSES[@]}"
+	do
+		if [[ "${_input_class}" == "${_class}" ]]
+		then
+			return 0
+		else
+			_not_valid=1
+		fi
+	done
+
+	if [[ "${_not_valid}" -eq 1 ]]; then
+		echo "ERROR: ${_input_class} is not a valid class"
+		exit 1
+	fi
+}
+
+# Function to operate VMs for chosen class
+function funcManageVms() {
 	local _action_opt=${1}
 	local _class_opt=${2}
 
-	for i in "${_IFA_VMS[@]}"
+	echo "Working in class: ${_class_opt}"
+
+	for _vm in "${_IFA_VMS[@]}"
 	do
-		if [[ "${i: -4}" == "${_class_opt}" ]]; then
-			echo  "utmctl ${_action_opt} ${i}"
+		if [[ "${_vm: -4}" == "${_class_opt}" ]]; then
+			echo  "utmctl ${_action_opt} ${_vm}"
+			echo "  ${_action_opt} VM:  * ${_vm}"
 		fi
 	done
 }
 
-# Main Script
-operateVMS "${_ACTION_OPT}" "${_CLASS_OPT}"
+
+###################
+### MAIN SCRIPT ###
+###################
+
+# Check if _ACTION_OPT and _CLASS_OPT are valid
+funcCheckAction "${_ACTION_OPT}"
+funcCheckClass "${_CLASS_OPT}"
+
+# Execute Commands
+funcManageVms "${_ACTION_OPT}" "${_CLASS_OPT}"
