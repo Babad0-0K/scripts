@@ -15,13 +15,25 @@
 declare -a _IFA_VMS
 declare -a _IFA_COURSES
 
-# List VMs
+# Populate Array _IFA_VMS with IFA related VMs
 while IFS= read -r line
 	do
 		if [[ "${line: -5:1}" == "-" ]]; then
 			_IFA_VMS+=("$line")
 		fi
 done < <(utmctl list | sed '1d' | awk '{print $3}')
+
+# Populate Array _IFA_COURSES with IFA Courses
+function ifaCourses{
+for _VM in "${_IFA_VMS[@]}"
+	do
+		if ! [[ $(echo ${_IFA_COURSES[@]} | fgrep -w "${_VM: -4}") ]]; then
+			_IFA_COURSES+=("${_VM: -4}")
+		fi
+done
+}
+
+# echo ${_IFA_COURSES[*]}
 
 
 # GETOPTS STUFF
