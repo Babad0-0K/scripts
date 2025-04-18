@@ -13,31 +13,46 @@
 
 # Declare VMs and Courses Array
 declare -a _IFA_VMS
-declare -a _IFA_COURSES
+declare -a _IFA_CLASSES
 
 # Populate Array _IFA_VMS with IFA related VMs
-while IFS= read -r line
-	do
-		if [[ "${line: -5:1}" == "-" ]]; then
-			_IFA_VMS+=("$line")
-		fi
-done < <(utmctl list | sed '1d' | awk '{print $3}')
-
-# Populate Array _IFA_COURSES with IFA Courses
-function ifaCourses{
-for _VM in "${_IFA_VMS[@]}"
-	do
-		if ! [[ $(echo ${_IFA_COURSES[@]} | fgrep -w "${_VM: -4}") ]]; then
-			_IFA_COURSES+=("${_VM: -4}")
-		fi
-done
+function ifaVMS {
+	while IFS= read -r line
+		do
+			if [[ "${line: -5:1}" == "-" ]]; then
+				_IFA_VMS+=("$line")
+			fi
+	done < <(utmctl list | sed '1d' | awk '{print $3}')
 }
 
-# echo ${_IFA_COURSES[*]}
+# Populate Array _IFA_CLASSES with IFA Courses
+function ifaClasses {
+	for _vm in "${_IFA_VMS[@]}"
+		do
+			if ! [[ $(echo ${_IFA_CLASSES[@]} | fgrep -w "${_vm: -4}") ]]; then
+				_IFA_CLASSES+=("${_vm: -4}")
+			fi
+	done
+}
+
+# List VMs sorted by Class
+function listVM {
+	for _class in "${_IFA_CLASSES[@]}"
+		do
+			echo "VMs for class: ${_class}"
+			for _vm in "${_IFA_VMS[@]}"
+				do
+				if [[ "${_vm: -4}" == "${_class}" ]]; then
+					echo "  * ${_vm}"
+				fi
+			done
+			echo ""
+	done
+}
 
 
 # GETOPTS STUFF
-_OPTSTRING="a:f:h"
+_OPTSTRING="a:f:lh"
 
 while getopts ${_OPTSTRING} _FACH; do
 	case "${_FACH}" in
@@ -47,8 +62,13 @@ while getopts ${_OPTSTRING} _FACH; do
 		f)
 			_FACH_OPT="${OPTARG}"
 			;;
+		l)
+			ifaVMS
+			ifaClasses
+			listVM
+			;;
 		h)
-			echo "Usage: utm [-a action] [-f <fach>] [-h]"
+			echo "Usage: utm [-a <action>] [-f <fach>] [-l] [-h]"
 			exit 0
 			;;
 		\?)
