@@ -8,6 +8,8 @@
 # Description:     CLI Script to start UTM VMs based by course
 # ===================================================================
 
+# todo: add courses array
+# todo: -l list courses +VMs
 
 # CSIN VMs // not needed anymore
 _CL1="LAB-CL1-CSIN"
@@ -16,17 +18,18 @@ _DC1="LAB-DC1-CSIN"
 # BMBs VMs // not needed anymore
 _KALI1="kali-2025-W15_HF-BMBS"
 
-declare -a _COURSE_VMS
+declare -a _IFA_VMS
+declare -a _IFA_COURSES
 
 # List VMs
 while IFS= read -r line
 	do
 		if [[ "${line: -5:1}" == "-" ]]; then
-			_COURSE_VMS+=("$line")
+			_IFA_VMS+=("$line")
 		fi
 done < <(utmctl list | sed '1d' | awk '{print $3}')
 
-#echo "${_COURSE_VMS[*]}"
+#echo "${_IFA_VMS[*]}"
 
 
 # GETOPTS STUFF
@@ -60,7 +63,7 @@ function operateVMS {
 	local _action_opt=${1}
 	local _fach_opt=${2}
 
-	for i in "${_COURSE_VMS[@]}"
+	for i in "${_IFA_VMS[@]}"
 	do
 		if [[ "${i: -4}" == "${_fach_opt}" ]]; then
 			# utmctl "${_action_opt}" "${i}"
