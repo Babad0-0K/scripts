@@ -5,18 +5,20 @@
 # Author:          Lorenzo De Simone
 # Version:         1.0
 # Created:         2025-04-16
-# Description:     CLI Script to start UTM VMs based by course
+# Description:     CLI Script to start UTM VMs based by Class
 # ===================================================================
 
-# todo: add courses array
-# todo: -l list courses +VMs
 
-# Declare VMs and Courses Array
+##########################
+### Preparation Tasks ####
+##########################
+
+# Declare VMs and classes array
 declare -a _IFA_VMS
 declare -a _IFA_CLASSES
 
-# Populate Array _IFA_VMS with IFA related VMs
-function ifaVMS {
+# Search for IFA VMs and save to _IFA_VMS
+function funcCheckVm() {
 	while IFS= read -r line
 		do
 			if [[ "${line: -5:1}" == "-" ]]; then
@@ -25,8 +27,8 @@ function ifaVMS {
 	done < <(utmctl list | sed '1d' | awk '{print $3}')
 }
 
-# Populate Array _IFA_CLASSES with IFA Courses
-function ifaClasses {
+# Get class from VM Name and save to _IFA_CLASSES
+function funcCheckClasses() {
 	for _vm in "${_IFA_VMS[@]}"
 		do
 			if ! [[ $(echo ${_IFA_CLASSES[@]} | fgrep -w "${_vm: -4}") ]]; then
@@ -35,8 +37,24 @@ function ifaClasses {
 	done
 }
 
+funcCheckVm
+funcCheckClasses
+
+
+##########################
+### Built-in Functions ###
+##########################
+
+# List Classes 
+function funcListClasses() {
+	for _class in "${_IFA_CLASSES[@]}"
+		do
+			echo "  ${_class}"
+		done
+}
+
 # List VMs sorted by Class
-function listVM {
+function funcListVm() {
 	for _class in "${_IFA_CLASSES[@]}"
 		do
 			echo "VMs for class: ${_class}"
@@ -51,7 +69,38 @@ function listVM {
 }
 
 
-# GETOPTS STUFF
+#########################
+### Script Usage Text ###
+#########################
+
+function funcHelp(){
+	echo "USAGE:"
+	echo "  utm -a <action> -f <fach>"
+	echo ""
+	echo "EXAMPLE:"
+	echo "  utm -a start -f BMBS"
+	echo "  utm -a stop -f BMBS"
+	echo ""
+	echo "OPTIONS:"
+	echo "  -l, list - List VMs sorted by Class"
+	echo "  -h, help - this text"
+	echo "  -a, action - what to do with the VMs"
+	echo "  -f, class - which class VMs you want to operate"
+	echo ""
+	echo "ACTIONS:"
+	echo "  start"
+	echo "  stop"
+	echo "  suspend"
+	echo ""
+	echo "CLASSES:"
+	funcListClasses	
+}
+
+
+###############################
+#### GETOPTS - TOOL OPTIONS ###
+###############################
+
 _OPTSTRING="a:f:lh"
 
 while getopts ${_OPTSTRING} _FACH; do
@@ -63,13 +112,12 @@ while getopts ${_OPTSTRING} _FACH; do
 			_FACH_OPT="${OPTARG}"
 			;;
 		l)
-			ifaVMS
-			ifaClasses
-			listVM
+			funcListVm
+			exit 1
 			;;
 		h)
-			echo "Usage: utm [-a <action>] [-f <fach>] [-l] [-h]"
-			exit 0
+			funcHelp
+			exit 1
 			;;
 		\?)
 			echo "Invalid option: -${OPTARG}" >&2
@@ -83,7 +131,7 @@ esac
 done
 
 # Function to operate VMs for chosen Fach 
-function operateVMS {
+function operateVMS() {
 	local _action_opt=${1}
 	local _fach_opt=${2}
 
