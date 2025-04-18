@@ -9,7 +9,6 @@
 # ===================================================================
 
 
-# to-do: implement error handling (done)
 # to-do: implement delete action
 # to-do: implement colors
 
