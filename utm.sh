@@ -14,6 +14,7 @@
 # to-do: implement actions array
 # to-do: implement error handling
 # to-do: implement delete action
+# to-do: implement colors
 
 ##########################
 ### Preparation Tasks ####
