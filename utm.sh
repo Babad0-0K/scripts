@@ -8,8 +8,8 @@
 # Description:     CLI Script to start UTM VMs based by Class
 # ===================================================================
 
-# to-do: no option should print help
-# to-do: make getopts cleaner
+# to-do: no option should print help (done)
+# to-do: make getopts cleaner (done)
 # to-do: implement error handling
 # to-do: implement delete action
 # to-do: implement colors
@@ -68,7 +68,7 @@ function funcListActions() {
 }
 
 # List VMs sorted by Class
-function funcListVm() {
+function funcListVmByClass() {
 	for _class in "${_IFA_CLASSES[@]}"
 		do
 			echo "VMs for class: ${_class}"
@@ -89,17 +89,17 @@ function funcListVm() {
 
 function funcHelp(){
 	echo "USAGE:"
-	echo "  utm -a <action> -f <fach>"
+	echo "  utm -a <action> -c <class>"
 	echo ""
 	echo "EXAMPLE:"
-	echo "  utm -a start -f BMBS"
-	echo "  utm -a stop -f BMBS"
+	echo "  utm -a start -c BMBS"
+	echo "  utm -a stop -c BMBS"
 	echo ""
 	echo "OPTIONS:"
 	echo "  -l, list - List VMs sorted by Class"
 	echo "  -h, help - this text"
 	echo "  -a, action - what to do with the VMs"
-	echo "  -f, class - which class VMs you want to operate"
+	echo "  -c, class - which class VMs you want to operate"
 	echo ""
 	echo "ACTIONS:"
 	funcListActions
@@ -113,47 +113,41 @@ function funcHelp(){
 #### GETOPTS - TOOL OPTIONS ###
 ###############################
 
-_OPTSTRING="a:f:lh"
+_OPTSTRING="a:c:lh"
 
-while getopts ${_OPTSTRING} _FACH; do
-	case "${_FACH}" in
-		a)
-			_ACTION_OPT="${OPTARG}"
-			;;
-		f)
-			_FACH_OPT="${OPTARG}"
-			;;
-		l)
-			funcListVm
-			exit 1
-			;;
-		h)
-			funcHelp
-			exit 1
-			;;
-		\?)
-			echo "Invalid option: -${OPTARG}" >&2
-			exit 1
-			;;
-		:)
-			echo "Option -${OPTARG} requires an arugment" >&2
-			exit 1
-			;;
-esac
+while getopts "${_OPTSTRING}" opt; do
+	case "${opt}" in
+		h) funcHelp; exit 0;;
+		a) _ACTION_OPT="${OPTARG}"; _CHECKARG1=1;;
+		c) _CLASS_OPT="${OPTARG}"; _CHECKARG2=2;;
+		l) funcListVmByClass; exit 0;;
+		\?) echo "**Unknown option**" >&2; echo ""; funcHelp; exit 1;;
+		:) echo "**Missing option argument**" >&2; echo ""; funcHelp; exit 1;;
+	esac
 done
+
+shift $(( OPTIND - 1 ))
+
+# Check if Argument Action and Argument Class has been set
+if [ "${_CHECKARG1}" == "" ] || [ "${_CHECKARG2}" == "" ]; then
+	echo "**At least one argument is missing**"
+	echo ""
+	funcHelp
+	exit
+fi
 
 # Function to operate VMs for chosen Fach 
 function operateVMS() {
 	local _action_opt=${1}
-	local _fach_opt=${2}
+	local _class_opt=${2}
 
 	for i in "${_IFA_VMS[@]}"
 	do
-		if [[ "${i: -4}" == "${_fach_opt}" ]]; then
+		if [[ "${i: -4}" == "${_class_opt}" ]]; then
 			echo  "utmctl ${_action_opt} ${i}"
 		fi
 	done
 }
 
 # Main Script
-operateVMS "${_ACTION_OPT}" "${_FACH_OPT}"
+operateVMS "${_ACTION_OPT}" "${_CLASS_OPT}"
