@@ -135,18 +135,30 @@ if [ "${_CHECKARG1}" == "" ] || [ "${_CHECKARG2}" == "" ]; then
 fi
 
 
+############
+## COLORS ##
+############
+
+cOFF='\033[0m'			# color off / default color
+rON='\033[0;31m'		# red color on
+gON='\033[0;32m'		# green color on
+bON='\033[0;34m'		# blue color on 
+BrON='\033[1;31m'		# bold red color on
+BgON='\033[1;32m'		# bold green color on
+BbON='\033[1;34m'		# bold blue color on 
+
 ########################
 ### SCRIPT FUNCTIONS ###
 ########################
 
 # Function to check if action is valid
 function funcCheckAction() {
-	local _input_action=${1}
+	local _action_opt=${1}
 	local _not_valid=0
 
 	for _action in "${_UTM_ACTIONS[@]}"
 	do
-		if [[ "${_input_action}" == "${_action}" ]]
+		if [[ "${_action_opt}" == "${_action}" ]]
 		then
 			return 0
 		else
@@ -155,19 +167,19 @@ function funcCheckAction() {
 	done
 
 	if [[ "${_not_valid}" -eq 1 ]]; then
-		echo "ERROR: ${_input_action} is not a valid action"
+		echo -e "${BrON}ERROR${cOFF}: ${_action_opt} is not a valid action"
 		exit 1
 	fi
 }
 
 # Function to check if class is valid
 function funcCheckClass() {
-	local _input_class=${1}
+	local _class_opt=${1}
 	local _not_valid=0
 
 	for _class in "${_IFA_CLASSES[@]}"
 	do
-		if [[ "${_input_class}" == "${_class}" ]]
+		if [[ "${_class_opt}" == "${_class}" ]]
 		then
 			return 0
 		else
@@ -176,7 +188,7 @@ function funcCheckClass() {
 	done
 
 	if [[ "${_not_valid}" -eq 1 ]]; then
-		echo "ERROR: ${_input_class} is not a valid class"
+		echo -e "${BrON}ERROR${cOFF}: No VMs for class ${_class_opt}"
 		exit 1
 	fi
 }
@@ -186,13 +198,13 @@ function funcManageVms() {
 	local _action_opt=${1}
 	local _class_opt=${2}
 
-	echo "Working in class: ${_class_opt}"
+	echo -e "Working in class: ${BbON}${_class_opt}${cOFF}"
 
 	for _vm in "${_IFA_VMS[@]}"
 	do
 		if [[ "${_vm: -4}" == "${_class_opt}" ]]; then
 			echo  "utmctl ${_action_opt} ${_vm}"
-			echo "  ${_action_opt} VM:  * ${_vm}"
+			echo -e "  ${_action_opt} VM:  * ${BbON}${_vm}${cOFF}"
 		fi
 	done
 }
