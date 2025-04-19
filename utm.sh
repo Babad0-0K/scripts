@@ -45,6 +45,22 @@ funcCheckVmIFA
 funcCheckClassesIFA
 
 
+############
+## COLORS ##
+############
+
+cOFF='\033[0m'			# color off / default color
+BON='\033[1m'			# bold text on
+rON='\033[0;31m'		# red color on
+gON='\033[0;32m'		# green color on
+bON='\033[0;34m'		# blue color on
+yON='\033[0;33m'		# yellow color on 
+BrON='\033[1;31m'		# bold red color on
+BgON='\033[1;32m'		# bold green color on
+BbON='\033[1;34m'		# bold blue color on
+ByON='\033[1;33m'		# bold yellow color on 	 
+
+
 ##########################
 ### Built-in Functions ###
 ##########################
@@ -135,18 +151,6 @@ if [ "${_CHECKARG1}" == "" ] || [ "${_CHECKARG2}" == "" ]; then
 fi
 
 
-############
-## COLORS ##
-############
-
-cOFF='\033[0m'			# color off / default color
-rON='\033[0;31m'		# red color on
-gON='\033[0;32m'		# green color on
-bON='\033[0;34m'		# blue color on 
-BrON='\033[1;31m'		# bold red color on
-BgON='\033[1;32m'		# bold green color on
-BbON='\033[1;34m'		# bold blue color on 
-
 ########################
 ### SCRIPT FUNCTIONS ###
 ########################
@@ -204,7 +208,11 @@ function funcManageVms() {
 	do
 		if [[ "${_vm: -4}" == "${_class_opt}" ]]; then
 			echo  "utmctl ${_action_opt} ${_vm}"
-			echo -e "  ${_action_opt} VM:  * ${BbON}${_vm}${cOFF}"
+			case "${_action_opt}" in
+				start) echo -e "  ${BgON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
+				stop) echo -e "  ${BrON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
+				suspend) echo -e "  ${ByON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
+			esac
 		fi
 	done
 }
