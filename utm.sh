@@ -206,7 +206,7 @@ function funcManageVms() {
 	for _vm in "${_IFA_VMS[@]}"
 	do
 		if [[ "${_vm: -4}" == "${_class_opt}" ]]; then
-			echo  "utmctl ${_action_opt} ${_vm}"
+			utmctl "${_action_opt}" "${_vm}"
 			case "${_action_opt}" in
 				start) echo -e "  ${BgON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
 				stop) echo -e "  ${BrON}${_action_opt} VM${cOFF}:  ${BON}*${cOFF} ${BbON}${_vm}${cOFF}";;
