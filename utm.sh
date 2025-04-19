@@ -10,7 +10,7 @@
 
 
 # to-do: implement delete action
-# to-do: implement colors
+# to-do: implement colors (done)
 
 ##########################
 ### Preparation Tasks ####
@@ -85,11 +85,11 @@ function funcListActions() {
 function funcListVmByClass() {
 	for _class in "${_IFA_CLASSES[@]}"
 	do
-		echo "VMs for class: ${_class}"
+		echo -e "${BON}VMs for class:${cOFF} ${BbON}${_class}${cOFF}"
 		for _vm in "${_IFA_VMS[@]}"
 		do
 			if [[ "${_vm: -4}" == "${_class}" ]]; then
-				echo "  * ${_vm}"
+				echo -e "  ${BON}*${cOFF} ${ByON}${_vm}${cOFF}"
 			fi
 		done
 		echo ""
