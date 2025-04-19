@@ -10,7 +10,6 @@
 
 
 # to-do: implement delete action
-# to-do: implement colors (done)
 
 ##########################
 ### Preparation Tasks ####
